@@ -23,10 +23,9 @@ const app = express();
 app.use(cors());
 
 app.get('/', (req, res) => {
-//   const str = '안녕하세요, 백엔드 입니다!';
-//   const json = JSON.stringify(str);
-//   res.send(json);
-  res.sendFile(__dirname + '/index.html');
+  const str = '안녕하세요, 백엔드 입니다!';
+  const json = JSON.stringify(str);
+  res.send(str);
 });
 
 app.listen(PORT, () => {

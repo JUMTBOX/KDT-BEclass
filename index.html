@@ -7,6 +7,21 @@
     <title>Document</title>
   </head>
   <body>
-    HI FROM HTML! ezezezezezezezezezezezezezezzezezezezezezezeezeze
+    <h1>HI FROM HTML!</h1>
+
+    <button onclick="fetchData()">백엔드 통신버튼</button>
+    <script>
+      const headerEl = document.querySelector('h1');
+
+      function fetchData() {
+        fetch('http://localhost:3000')
+          .then((res) => {
+            return res.json();
+          })
+          .then((data) => {
+            headerEl.innerHTML = data;
+          });
+      }
+    </script>
   </body>
 </html>
