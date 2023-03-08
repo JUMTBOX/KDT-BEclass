@@ -16,7 +16,6 @@
 const express = require('express');
 
 const cors = require('cors');
-const { json } = require('stream/consumers');
 
 const PORT = 3000;
 const app = express();
