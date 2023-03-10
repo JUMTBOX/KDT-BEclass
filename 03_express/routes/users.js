@@ -1,21 +1,8 @@
-// @ts-check
-
 const express = require('express');
 
 const Router = express.Router();
 
-const USER = {
-  1: {
-    id: 'yjey',
-    name: '양재연',
-  },
-  2: {
-    id: 'kim',
-    name: '김유난',
-  },
-};
-
-const userArr = [
+const user = [
   {
     id: 'yjey',
     name: '양재연',
@@ -29,55 +16,91 @@ const userArr = [
 ];
 
 Router.get('/', (req, res) => {
-  const userCounts = userArr.length;
-  res.render('users', { userArr, userCounts });
+  const userCounts = user.length;
+  res.render('users', { user, userCounts });
 });
 
 Router.get('/id/:id', (req, res) => {
-  const userData = USER[req.params.id];
+  const userData = user.find((el) => el.id === req.params.id);
   if (userData) {
     res.send(userData);
   } else {
-    res.send('ID를 못찾겠어요');
+    const err = new Error('ID를 못찾겠어요');
+    err.statusCode = 404;
+    throw err;
   }
 });
 
 Router.post('/add', (req, res) => {
-  if (req.query.id && req.query.name) {
-    const newUser = {
-      id: req.query.id,
-      name: req.query.name,
-    };
+  console.log(req.body);
 
-    USER[Object.keys(USER).length + 1] = newUser;
-
-    res.send('회원등록 완료');
+  if (Object.keys(req.query).length >= 1) {
+    if (req.query.id && req.query.name && req.query.email) {
+      const newUser = {
+        id: req.query.id,
+        name: req.query.name,
+        email: req.query.email,
+      };
+      user.push(newUser);
+      res.send('회원등록 완료');
+    } else {
+      const err = new Error('쿼리 입력이 잘못되었습니다.');
+      err.statusCode = 400;
+      throw err;
+    }
+  } else if (req.body) {
+    if (req.body.id && req.body.name && req.body.email) {
+      const newUser = {
+        id: req.body.id,
+        name: req.body.name,
+        email: req.body.email,
+      };
+      user.push(newUser);
+      res.redirect('/users');
+    } else {
+      const err = new Error('폼태그 입력을 확인하세요!');
+      err.statusCode = 400;
+      throw err;
+    }
   } else {
-    res.send('쿼리 입력이 잘못됨');
+    const err = new Error('데이터가 입력되지 않았습니다.');
+    err.statusCode = 400;
+    throw err;
   }
 });
 
-Router.get('/', (req, res) => {
-  res.send(userArr);
-});
-
 Router.put('/modify/:id', (req, res) => {
-  if (!req.params.id || !req.query.id || !req.query.name) res.send('아이디가 틀렸어요');
-  const modifyUser = {
-    id: req.query.id,
-    name: req.query.name,
-  };
-  console.log(USER[req.params.id]);
-  USER[req.params.id] = modifyUser;
-  res.send('회원정보 수정 완료');
+  if (req.query.name && req.query.email) {
+    const userIndex = user.findIndex((el) => el.id === req.params.id);
+    if (userIndex !== -1) {
+      user[userIndex] = {
+        id: req.params.id,
+        name: req.query.name,
+        email: req.query.email,
+      };
+      res.send('회원정보 수정 완료');
+    } else {
+      const err = new Error('해당 ID를 가진 회원이 없습니다..');
+      err.statusCode = 404;
+      throw err;
+    }
+  } else {
+    const err = new Error('쿼리 입력이 잘못되었습니다.');
+    err.statusCode = 404;
+    throw err;
+  }
 });
 
 Router.delete('/delete/:id', (req, res) => {
-  if (req.params.id in USER) {
-    delete USER[req.params.id];
-    res.send('삭제 완료');
+  console.log(req.params.id);
+  const userIndex = user.findIndex((el) => el.id === req.params.id);
+  if (userIndex !== -1) {
+    user.splice(userIndex, 1);
+    res.send('회원 삭제 완료');
   } else {
-    res.send('그런 회원은 없어요');
+    const err = new Error('해당 ID를 가진 회원이 없습니다..');
+    err.statusCode = 404;
+    throw err;
   }
 });
 
